@@ -82,9 +82,11 @@ for (let r = 1; r <= REPS; r++) {
 
       test('B3 — real keystroke typing (search-as-you-type)', async ({ page }) => {
         // REAL keys via pressSequentially so keyup fires (fill would not).
+        // Use the same CSS attribute selector as Biloba (not Playwright's :visible
+        // engine) so the visibility filter is character-for-character identical.
         await page.locator('#search').pressSequentially('ap');
-        await expect(page.locator('.fruit:visible')).toHaveCount(2);
-        await expect(page.locator('.fruit:visible')).toHaveText(['Apple', 'Apricot']);
+        await expect(page.locator(".fruit:not([style*='display: none'])")).toHaveCount(2);
+        await expect(page.locator(".fruit:not([style*='display: none'])")).toHaveText(['Apple', 'Apricot']);
       });
     });
 
@@ -154,8 +156,9 @@ for (let r = 1; r <= REPS; r++) {
         await expect(page.locator('#heading')).toBeAttached();
         // REAL keys via pressSequentially so keyup fires (fill would not).
         await page.locator('#q').pressSequentially('cat-3');
-        // visible = not display:none, 200 of the 1000 rows match cat-3.
-        await expect(page.locator('.row:visible')).toHaveCount(200);
+        // visible = not display:none; same CSS attribute selector as Biloba (not
+        // Playwright's :visible engine, which would visibility-check all 1000 rows).
+        await expect(page.locator(".row:not([style*='display: none'])")).toHaveCount(200);
       });
 
       test('D3 — gated multi-step wizard', async ({ page }) => {
