@@ -103,9 +103,10 @@ for (let r = 1; r <= REPS; r++) {
 
       test('C2 — stub the request (short-circuit)', async ({ page }) => {
         await page.route('**/api/items', async (route) => {
+          // fixed string (not JSON.stringify) to match Biloba's StubResponse.Body literal
           await route.fulfill({
             contentType: 'application/json',
-            body: JSON.stringify({ items: ['Stubbed'] }),
+            body: '{"items":["Stubbed"]}',
           });
         });
         await page.locator('#load').click();
@@ -130,7 +131,8 @@ for (let r = 1; r <= REPS; r++) {
         // Hit the REAL server, then rewrite the body (a real round-trip, unlike C2).
         await page.route('**/api/items', async (route) => {
           const response = await route.fetch();
-          await route.fulfill({ response, body: JSON.stringify({ items: ['Modified'] }) });
+          // fixed string (not JSON.stringify) to match Biloba's WithBody literal
+          await route.fulfill({ response, body: '{"items":["Modified"]}' });
         });
         await page.locator('#load').click();
         await expect(page.locator('.result')).toHaveCount(1);
