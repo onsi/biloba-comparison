@@ -1,5 +1,9 @@
 # Biloba vs Playwright — a performance comparison
 
+> 🤖 **This whole comparison — harness, scenarios, charts, and write-up — was generated
+> by [Claude](https://www.anthropic.com/claude) (Opus 4.8), working from a brief.
+> Feedback is welcome, just [open an issue](https://github.com/onsi/biloba-comparison/issues)!**
+
 A fair, reproducible **speed** comparison between
 [Biloba](https://github.com/onsi/biloba) (Go, on chromedp) and
 [Playwright Test](https://playwright.dev) (TypeScript/Node). One shared server, one
@@ -7,8 +11,7 @@ canonical scenario list implemented identically on every side, a framework-neutr
 external stopwatch. The aim is to measure framework + runtime overhead for an
 identical browser-test workload — not to manufacture a win. Read
 [`METHODOLOGY.md`](./METHODOLOGY.md) for the fairness controls and threats-to-validity,
-[`SCENARIOS.md`](./SCENARIOS.md) for the exact workload, and [`comparison.md`](./comparison.md)
-for the full results.
+and [`SCENARIOS.md`](./SCENARIOS.md) for the exact workload.
 
 > **Numbers below are from one machine** (Apple M1 Max, macOS, 8 performance cores),
 > recorded 2026-06-15 — indicative, not universal. Run it yourself.
@@ -36,11 +39,13 @@ numbers show, still runs ~2× faster than Playwright whole-suite.
 
 ## Topline — whole-suite wall clock (8 workers, n=15)
 
+Median wall clock ± stddev over 15 repeats:
+
 | config | parallel(8) | serial(1) | vs Playwright (parallel / serial) |
 |---|---:|---:|---|
-| **biloba-fast** | **2.57s** | **9.55s** | **3.2× / 4.0×** |
-| **biloba-realistic** | **3.26s** | **18.60s** | **2.5× / 2.1×** |
-| **playwright** | 8.23s | 38.37s | — |
+| **biloba-fast** | **2.57 ± 0.06s** | **9.55 ± 0.05s** | **3.2× / 4.0×** |
+| **biloba-realistic** | **3.26 ± 0.03s** | **18.60 ± 0.07s** | **2.5× / 2.1×** |
+| **playwright** | 8.23 ± 0.24s | 38.37 ± 0.56s | — |
 
 Each bar below splits the total into **fixed startup** (Biloba shares one Chrome; Playwright
 launches one browser per worker) and **spec runtime**, with ±stddev error bars:
@@ -54,23 +59,24 @@ launches one browser per worker) and **spec runtime**, with ±stddev error bars:
 
 ## By category — the same three configs, per bucket
 
-Serial **marginal per-spec** (each config's fixed startup is fit and subtracted, so a small
-focused bucket isn't startup-dominated). This shows how the gap behaves as the work gets heavier.
+Serial **mean per-test duration ± SEM** (~25 samples/scenario — the same numbers the chart
+shows). This shows how the gap behaves as the work gets heavier. C/D have wide error bars
+because those buckets mix fast and slow scenarios (latency / async); ratios use the means.
 
 | bucket | biloba-fast | biloba-realistic | playwright | pw/fast | pw/real |
 |---|---:|---:|---:|---:|---:|
-| A/B static (reads) | 10.3 ms | 24.4 ms | 80.0 ms | **7.8×** | 3.3× |
-| C network | 86.1 ms | 106.9 ms | 259.8 ms | 3.0× | 2.4× |
-| D scale | 124.0 ms | 180.4 ms | 306.3 ms | **2.5×** | 1.7× |
-| F semantic locators | 14.4 ms | 29.5 ms | 81.2 ms | 5.6× | 2.8× |
-| G interaction vocabulary | 10.2 ms | 47.4 ms | 90.7 ms | 8.9× | 1.9× |
-| H pointer options | 10.0 ms | 42.2 ms | 82.0 ms | 8.2× | 1.9× |
-| E realism (occlusion/scroll) | 11.1 ms | 165.4 ms | 235.2 ms | 21.2× | 1.4× |
+| A/B static (reads) | 11.2 ± 0.2 ms | 25.7 ± 1.8 ms | 73.1 ± 1.7 ms | **6.5×** | 2.8× |
+| C network | 83.6 ± 10.6 ms | 102.6 ± 10.5 ms | 249.9 ± 27.2 ms | 3.0× | 2.4× |
+| D scale | 120.9 ± 17.2 ms | 175.5 ± 17.1 ms | 295.1 ± 32.8 ms | **2.4×** | 1.7× |
+| F semantic locators | 15.7 ± 0.2 ms | 29.7 ± 1.2 ms | 69.8 ± 0.7 ms | 4.4× | 2.4× |
+| G interaction vocabulary | 11.2 ± 0.1 ms | 47.0 ± 1.9 ms | 83.1 ± 1.1 ms | 7.4× | 1.8× |
+| H pointer options | 11.2 ± 0.4 ms | 41.9 ± 1.2 ms | 71.9 ± 0.6 ms | 6.4× | 1.7× |
+| E realism (occlusion/scroll) | 13.2 ± 0.3 ms | 163.2 ± 18.4 ms | 211.7 ± 19.1 ms | 16.0× | 1.3× |
 
 ![per-bucket per-test duration](charts/buckets.svg)
 
-- biloba-fast's lead is **widest (~8×) on trivial DOM** — almost pure framework overhead —
-  and **compresses to ~2.5×** once real browser work dominates (D scale), where both run on
+- biloba-fast's lead is **widest (~7×) on trivial DOM** — almost pure framework overhead —
+  and **compresses to ~2.4×** once real browser work dominates (D scale), where both run on
   the same Chromium engine.
 - biloba-realistic tracks **~2× faster than Playwright** wherever it does real input, and
   **converges toward it on the heaviest work** (D 1.7×) where both are engine-bound.
@@ -116,12 +122,14 @@ Prereqs: Go, Node ≥18, a one-time browser install on each side (`biloba/README
 `playwright/README.md`). Then:
 
 ```bash
-./run.sh                 # topline: all three configs, whole-suite wall clock
-./scaling.sh             # startup vs marginal per-spec runtime (the fit behind the chart)
-REPS=16 ./buckets.sh     # three-way per-bucket marginal per-spec
-./pertest.sh             # per-test timing → charts/{scatter,buckets}.svg
+./run.sh                 # topline table: all three configs, whole-suite wall clock
+./scaling.sh             # startup vs runtime fit (behind the topline chart)
+./pertest.sh             # per-test timing → the per-bucket table + scatter/bucket charts
+REPS=16 ./buckets.sh     # cross-check: per-bucket marginal per-spec via wall clock (startup-subtracted)
 ```
 
-The figures are SVGs under [`charts/`](./charts), generated by the stdlib-only Go tool there.
+The per-bucket table & charts come from `pertest.sh` (mean per-test); `buckets.sh` is an
+independent wall-clock cross-check that lands in the same ballpark. The figures are SVGs under
+[`charts/`](./charts), generated by the stdlib-only Go tool there.
 Layout: `server/` (shared Go target + fixtures), `biloba/` (Ginkgo suite), `playwright/`
 (`@playwright/test` suite), `charts/` (SVG generator), and the run scripts.

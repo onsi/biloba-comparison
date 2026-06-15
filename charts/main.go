@@ -173,6 +173,37 @@ func pertest(fastPath, realPath, pwPath, outdir string) {
 		break
 	}
 	fmt.Printf("wrote %s/scatter.svg and %s/buckets.svg (%d scenarios, ~%d samples each)\n", outdir, outdir, len(pts), n)
+	printStats(fast, real, pw)
+}
+
+// printStats dumps per-bucket and per-scenario mean ± SEM (ms) for each config, so the
+// README's bucket table can carry the same numbers the charts show.
+func printStats(fast, real, pw map[string][]float64) {
+	ms := func(v []float64) string {
+		m := meanOf(v)
+		return fmt.Sprintf("%.1f±%.1f", m, sdOf(v, m)/math.Sqrt(float64(len(v))))
+	}
+	pool := func(m map[string][]float64, pred func(string) bool) []float64 {
+		var all []float64
+		for c, v := range m {
+			if pred(c) {
+				all = append(all, v...)
+			}
+		}
+		return all
+	}
+	fmt.Println("\nper-bucket mean±SEM (ms)   fast / realistic / playwright")
+	for _, bk := range []string{"A/B", "C", "D", "E", "F", "G", "H"} {
+		bk := bk
+		p := func(c string) bool { return bucketOf(c) == bk }
+		fmt.Printf("  %-4s  %s  /  %s  /  %s\n", bk, ms(pool(fast, p)), ms(pool(real, p)), ms(pool(pw, p)))
+	}
+	fmt.Println("per-scenario (E):")
+	for _, sc := range []string{"E1", "E2"} {
+		sc := sc
+		p := func(c string) bool { return c == sc }
+		fmt.Printf("  %-4s  %s  /  %s  /  %s\n", sc, ms(pool(fast, p)), ms(pool(real, p)), ms(pool(pw, p)))
+	}
 }
 
 // ============================ config: startup vs runtime ============================
