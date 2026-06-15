@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Locators Fixture</title>
+</head>
+<body>
+  <h1 id="heading">Locators</h1>
+
+  <!-- F2 target: selected by visible text -->
+  <p id="featured">Featured item</p>
+
+  <!-- F3 target: selected by its associated <label> -->
+  <form id="signup" onsubmit="return false">
+    <label for="email">Email</label>
+    <input id="email" name="email" type="text" />
+  </form>
+
+  <!-- F1 target: selected by role=button + accessible name "Save" -->
+  <button id="save-btn">Save</button>
+  <div id="save-result">no</div>
+
+  <!-- Distractors: ~200 roled, named elements so the accessible-name engine
+       (Biloba's ByRole/ByText and Playwright's getByRole/getByText) has a real
+       full-document scan to do. None of them are named "Save", "Featured item",
+       or labelled "Email", so the targets above stay unique. This is what makes
+       the CSS-hook-vs-locator delta measurable: CSS jumps straight to an #id,
+       the locator engines walk the document. -->
+  <ul id="distractors"></ul>
+
+  <script>
+    document.getElementById('save-btn').addEventListener('click', () => {
+      document.getElementById('save-result').textContent = 'saved';
+    });
+    const ul = document.getElementById('distractors');
+    let html = '';
+    for (let i = 0; i < 200; i++) {
+      html += '<li><button>Item ' + i + '</button><span>label ' + i + '</span></li>';
+    }
+    ul.innerHTML = html;
+  </script>
+</body>
+</html>

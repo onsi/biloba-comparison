@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Async Fixture</title>
+</head>
+<body>
+  <h1 id="heading">Async</h1>
+  <button id="start">Start</button>
+  <ul id="async-list"></ul>
+  <script>
+    // Staggered async: clicking Start appends 10 items, one every 40ms (~400ms total).
+    document.getElementById('start').addEventListener('click', () => {
+      const ul = document.getElementById('async-list');
+      ul.innerHTML = '';
+      for (let i = 1; i <= 10; i++) {
+        setTimeout(() => {
+          const li = document.createElement('li');
+          li.className = 'async-item';
+          li.textContent = 'Item ' + i;
+          ul.appendChild(li);
+        }, i * 40);
+      }
+    });
+  </script>
+</body>
+</html>

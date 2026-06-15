@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Pointer Options Fixture</title>
+</head>
+<body>
+  <h1 id="heading">Pointer</h1>
+
+  <!-- H1: a sized pad that records the click offset relative to its own top-left
+       corner — exactly the semantics of Biloba's b.At(x,y) and Playwright's
+       { position: {x,y} }. -->
+  <div id="click-pad" style="width:200px;height:200px;background:#cde"></div>
+  <span id="click-pad-result">none</span>
+
+  <!-- H2: records which keyboard modifiers were held during the click. -->
+  <button id="mod-btn">Modify me</button>
+  <span id="mod-result">no</span>
+
+  <script>
+    const set = (id, v) => (document.getElementById(id).textContent = v);
+
+    document.getElementById('click-pad').addEventListener('click', (e) => {
+      const r = document.getElementById('click-pad').getBoundingClientRect();
+      const x = Math.round(e.clientX - r.left), y = Math.round(e.clientY - r.top);
+      // Assert the offset was honored near (30,40) rather than pixel-exact: the
+      // element's box can land on a fractional CSS pixel, so the recorded offset
+      // is ±1 of the target. A default centre click would be ~(100,100), well
+      // outside tolerance — so "ok" still proves b.At / { position } took effect.
+      set('click-pad-result', (Math.abs(x - 30) <= 2 && Math.abs(y - 40) <= 2) ? 'ok' : x + ',' + y);
+    });
+
+    document.getElementById('mod-btn').addEventListener('click', (e) => {
+      const mods = [];
+      if (e.shiftKey) mods.push('shift');
+      if (e.ctrlKey) mods.push('control');
+      if (e.altKey) mods.push('alt');
+      if (e.metaKey) mods.push('meta');
+      set('mod-result', mods.join('+') || 'none');
+    });
+  </script>
+</body>
+</html>

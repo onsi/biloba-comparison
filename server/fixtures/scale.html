@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Scale Fixture</title>
+</head>
+<body>
+  <h1 id="heading">Scale</h1>
+  <input id="q" type="text" placeholder="filter by category" />
+  <table>
+    <tbody id="rows"></tbody>
+  </table>
+  <script>
+    // 1000 rows, 5 categories evenly distributed (200 each).
+    const tb = document.getElementById('rows');
+    let html = '';
+    for (let i = 0; i < 1000; i++) {
+      html += `<tr class="row" data-id="${i}"><td class="name">Item ${i}</td><td class="cat">cat-${i % 5}</td></tr>`;
+    }
+    tb.innerHTML = html;
+
+    // search-as-you-type filter over the category column (needs real keyup)
+    document.getElementById('q').addEventListener('keyup', () => {
+      const v = document.getElementById('q').value.toLowerCase();
+      document.querySelectorAll('#rows .row').forEach((r) => {
+        const cat = r.querySelector('.cat').textContent.toLowerCase();
+        r.style.display = cat.includes(v) ? '' : 'none';
+      });
+    });
+  </script>
+</body>
+</html>

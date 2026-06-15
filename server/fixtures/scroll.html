@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Scroll Fixture</title>
+</head>
+<body>
+  <h1 id="heading">Scroll</h1>
+  <div style="height:4000px">spacer</div>
+  <button id="below-btn">Bottom button</button>
+  <p id="scroll-result"></p>
+  <script>
+    // #below-btn sits ~4000px below the fold. Playwright scrolls it into view
+    // before clicking; Biloba's el.click() fires without scrolling.
+    document.getElementById('below-btn').addEventListener('click', () => {
+      document.getElementById('scroll-result').textContent = 'clicked';
+    });
+  </script>
+</body>
+</html>

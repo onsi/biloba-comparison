@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Network Fixture</title>
+</head>
+<body>
+  <h1 id="heading">Network</h1>
+  <button id="load">Load Items</button>
+  <button id="load-slow">Load Slow</button>
+  <ul id="results"></ul>
+
+  <script>
+    async function load(url) {
+      const ul = document.querySelector('#results');
+      ul.innerHTML = '';
+      try {
+        const res = await fetch(url);
+        const data = await res.json();
+        data.items.forEach((name) => {
+          const li = document.createElement('li');
+          li.className = 'result';
+          li.textContent = name;
+          ul.appendChild(li);
+        });
+      } catch (e) {
+        // A rejected fetch (e.g. an aborted request) lands here. Render a single
+        // sentinel .result so an abort is observable identically on both sides.
+        const li = document.createElement('li');
+        li.className = 'result';
+        li.textContent = 'Error';
+        ul.appendChild(li);
+      }
+    }
+    document.querySelector('#load').addEventListener('click', () => load('/api/items'));
+    document.querySelector('#load-slow').addEventListener('click', () => load('/api/slow-items'));
+  </script>
+</body>
+</html>

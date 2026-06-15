@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Interactions Fixture</title>
+</head>
+<body>
+  <h1 id="heading">Interactions</h1>
+
+  <!-- counter: click increments #count -->
+  <button id="increment">Increment</button>
+  <span id="count">0</span>
+
+  <!-- form: Save echoes the current values into #result (no network) -->
+  <form id="profile" onsubmit="return false">
+    <input id="name" name="name" type="text" />
+    <select id="role" name="role">
+      <option value="admin">Admin</option>
+      <option value="editor">Editor</option>
+      <option value="viewer">Viewer</option>
+    </select>
+    <label><input id="subscribe" name="subscribe" type="checkbox" /> Subscribe</label>
+    <button id="save" type="button">Save</button>
+  </form>
+  <p id="result"></p>
+
+  <!-- search-as-you-type: filters #fruits on each keyup (needs REAL key events) -->
+  <input id="search" type="text" placeholder="Filter fruit" />
+  <ul id="fruits">
+    <li class="fruit">Apple</li>
+    <li class="fruit">Apricot</li>
+    <li class="fruit">Banana</li>
+    <li class="fruit">Cherry</li>
+  </ul>
+
+  <script>
+    const $ = (s) => document.querySelector(s);
+
+    let count = 0;
+    $('#increment').addEventListener('click', () => {
+      count++;
+      $('#count').textContent = String(count);
+    });
+
+    $('#save').addEventListener('click', () => {
+      const name = $('#name').value;
+      const role = $('#role').value;
+      const sub = $('#subscribe').checked ? 'subscribed' : 'unsubscribed';
+      $('#result').textContent = name + ' / ' + role + ' / ' + sub;
+    });
+
+    $('#search').addEventListener('keyup', () => {
+      const q = $('#search').value.toLowerCase();
+      document.querySelectorAll('#fruits .fruit').forEach((li) => {
+        li.style.display = li.textContent.toLowerCase().includes(q) ? '' : 'none';
+      });
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,13 @@
+{
+  "_note": "Transcribed from run.sh (median + stddev, n=15) and scaling.sh (startup intercept) on the machine/date stamped in comparison.md. total = run.sh median; startup = scaling fit intercept; spec runtime = total - startup; stddev = run.sh stddev. Regenerate by re-running run.sh + scaling.sh and updating these rows, then: (cd charts && go run . config summary.json .)",
+  "workers": 8,
+  "specs": 256,
+  "rows": [
+    { "config": "biloba-fast",      "mode": "parallel", "startup": 0.78, "total": 2.57,  "stddev": 0.06 },
+    { "config": "biloba-realistic", "mode": "parallel", "startup": 0.71, "total": 3.26,  "stddev": 0.03 },
+    { "config": "playwright",       "mode": "parallel", "startup": 1.98, "total": 8.23,  "stddev": 0.24 },
+    { "config": "biloba-fast",      "mode": "serial",   "startup": 0.25, "total": 9.55,  "stddev": 0.05 },
+    { "config": "biloba-realistic", "mode": "serial",   "startup": 0.26, "total": 18.60, "stddev": 0.07 },
+    { "config": "playwright",       "mode": "serial",   "startup": 1.10, "total": 38.37, "stddev": 0.56 }
+  ]
+}

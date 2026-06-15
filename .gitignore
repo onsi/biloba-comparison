@@ -1,0 +1,12 @@
+# Go compiled test binaries (produced by `ginkgo build`)
+*.test
+# transient server build
+cmp-server
+
+# Biloba on-failure / automation screenshots
+biloba-screenshots/
+
+# Node / Playwright
+node_modules/
+playwright/test-results/
+playwright/playwright-report/

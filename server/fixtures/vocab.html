@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Vocabulary Fixture</title>
+</head>
+<body>
+  <h1 id="heading">Vocabulary</h1>
+
+  <!-- All interactive targets sit near the top so realistic mode (which scrolls
+       the element to the viewport centre and dispatches real CDP input) can reach
+       them without large scrolls. The event handlers are byte-for-byte the same
+       shapes Biloba's own realistic-mode test fixture uses, so they are known to
+       fire under BOTH the fast synthetic path and the realistic CDP path. -->
+
+  <button id="dbl-btn">Double me</button>
+  <span id="dbl-result">no</span>
+
+  <button id="ctx-btn">Right me</button>
+  <span id="ctx-result">no</span>
+
+  <button id="aux-btn">Middle me</button>
+  <span id="aux-result">no</span>
+
+  <div id="drag-src" style="display:inline-block;padding:8px;background:#cde">Drag me</div>
+  <div id="drop-zone" style="display:inline-block;padding:8px;background:#dec">Drop here</div>
+  <span id="drop-result">no</span>
+
+  <button id="tap-btn">Tap me</button>
+  <span id="tap-result">no</span>
+
+  <!-- A mid-document scrollable box (trailing spacer keeps it off the document's
+       bottom edge so realistic-mode wheel input lands on it). -->
+  <div id="scroll-box" style="height:100px;overflow:auto;background:#eef"><div style="height:1000px">tall</div></div>
+  <span id="wheel-result">no</span>
+  <div style="height:800px">spacer</div>
+
+  <script>
+    const set = (id, v) => (document.getElementById(id).textContent = v);
+
+    const dblBtn = document.getElementById('dbl-btn');
+    let dblClicks = 0;
+    dblBtn.addEventListener('click', () => (dblClicks += 1));
+    dblBtn.addEventListener('dblclick', () => set('dbl-result', 'double'));
+
+    document.getElementById('ctx-btn').addEventListener('contextmenu', (e) => {
+      e.preventDefault();
+      set('ctx-result', 'menu');
+    });
+
+    document.getElementById('aux-btn').addEventListener('auxclick', (e) => {
+      if (e.button === 1) set('aux-result', 'middle');
+    });
+
+    let dragging = false;
+    document.getElementById('drag-src').addEventListener('pointerdown', () => (dragging = true));
+    document.getElementById('drop-zone').addEventListener('pointerup', () => {
+      if (dragging) set('drop-result', 'dropped');
+      dragging = false;
+    });
+
+    document.getElementById('tap-btn').addEventListener('touchend', () => set('tap-result', 'tapped'));
+
+    document.getElementById('scroll-box').addEventListener('wheel', () => set('wheel-result', 'wheeled'));
+  </script>
+</body>
+</html>

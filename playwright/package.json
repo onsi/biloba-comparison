@@ -1,0 +1,14 @@
+{
+  "name": "playwright-comparison",
+  "version": "1.0.0",
+  "description": "Playwright side of the Biloba-vs-Playwright benchmark (see ../SCENARIOS.md)",
+  "private": true,
+  "scripts": {
+    "test": "playwright test"
+  },
+  "license": "ISC",
+  "type": "commonjs",
+  "devDependencies": {
+    "@playwright/test": "^1.60.0"
+  }
+}

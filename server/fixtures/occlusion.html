@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Occlusion Fixture</title>
+</head>
+<body>
+  <h1 id="heading">Occlusion</h1>
+  <button id="occluded-btn">Click me</button>
+  <span id="occ-count">0</span>
+  <!-- full-screen overlay that intercepts pointer events, auto-dismissed at 250ms -->
+  <div id="overlay" style="position:fixed;inset:0;background:rgba(0,0,0,0.3);z-index:9999"></div>
+  <script>
+    let c = 0;
+    document.getElementById('occluded-btn').addEventListener('click', () => {
+      c++;
+      document.getElementById('occ-count').textContent = String(c);
+    });
+    // The button is fully covered until this fires. A real user cannot click it
+    // before 250ms; Playwright's actionability waits, Biloba's el.click() does not.
+    setTimeout(() => {
+      const o = document.getElementById('overlay');
+      if (o) o.remove();
+    }, 250);
+  </script>
+</body>
+</html>

@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Wizard Fixture</title>
+</head>
+<body>
+  <h1 id="heading">Wizard</h1>
+  <div id="wizard"></div>
+  <p id="summary"></p>
+  <script>
+    // 4-step gated wizard: each step's Next/Finish is DISABLED until its input is
+    // non-empty (enabled on the input event). Only the current step is visible.
+    const steps = 4;
+    let cur = 1;
+    const vals = {};
+    const w = document.getElementById('wizard');
+
+    function render() {
+      w.innerHTML = '';
+      for (let s = 1; s <= steps; s++) {
+        const d = document.createElement('div');
+        d.className = 'step';
+        d.id = 'step' + s;
+        d.style.display = s === cur ? '' : 'none';
+
+        const inp = document.createElement('input');
+        inp.id = 'input' + s;
+        inp.value = vals[s] || '';
+
+        const btn = document.createElement('button');
+        btn.id = (s < steps ? 'next' : 'finish') + s;
+        btn.textContent = s < steps ? 'Next' : 'Finish';
+        btn.disabled = !inp.value;
+
+        inp.addEventListener('input', () => {
+          vals[s] = inp.value;
+          btn.disabled = !inp.value;
+        });
+        btn.addEventListener('click', () => {
+          if (s < steps) {
+            cur = s + 1;
+            render();
+          } else {
+            document.getElementById('summary').textContent = Object.values(vals).join('-');
+          }
+        });
+
+        d.appendChild(inp);
+        d.appendChild(btn);
+        w.appendChild(d);
+      }
+    }
+    render();
+  </script>
+</body>
+</html>
